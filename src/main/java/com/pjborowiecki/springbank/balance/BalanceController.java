@@ -1,7 +1,5 @@
 package com.pjborowiecki.springbank.balance;
 
-package com.pjborowiecki.springbank.balance;
-
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
