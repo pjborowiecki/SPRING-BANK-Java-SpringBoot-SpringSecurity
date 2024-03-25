@@ -1,5 +1,6 @@
-package com.pjborowiecki.springbank.customer;
+package com.pjborowiecki.springbank.loan;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,40 +10,46 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class Customer {
+@Table(name = "loans")
+public class Loan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    @Column(name = "customer_id", nullable = false, unique = true)
+    @Column(name = "loan_number", nullable = false, unique = true)
+    private Long loanNumber;
+
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
-    @Column(nullable = false, length = 64)
-    private String name;
+    @Column(name = "start_date", nullable = false)
+    private Date startDate;
 
-    @Column(nullable = false, unique = true, length = 64)
-    private String email;
+    @Column(name = "loan_type", nullable = false, length = 64)
+    private String loanType;
 
-    @Column(nullable = false, length = 64)
-    private String mobile;
+    @Column(name = "amount_total", nullable = false)
+    private Long amountTotal;
 
-    @Column(nullable = false, length = 512)
-    private String password;
+    @Column(name = "amount_paid", nullable = false)
+    private Long amountPaid;
 
-    @Column(nullable = false, length = 32)
-    private String role;
+    @Column(name = "amount_outstanding", nullable = false)
+    private Long amountOutstanding;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 }

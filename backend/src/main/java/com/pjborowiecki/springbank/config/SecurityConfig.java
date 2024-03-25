@@ -12,11 +12,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class SecurityConfig {
 
         private static final String[] PUBLIC_URLS = {
-                        "/api/v1/contact", "/api/v1/notifications", "/api/v1/auth/signup"
+                        "/api/v1/message", "/api/v1/notification", "/api/v1/auth/signup"
         };
 
         private static final String[] PROTECTED_URLS = {
-                        "/api/v1/account", "/api/v1/balance", "/api/v1/loans", "/api/v1/cards"
+                        "/api/v1/account", "/api/v1/balance", "/api/v1/loan", "/api/v1/card"
         };
 
         @Bean
