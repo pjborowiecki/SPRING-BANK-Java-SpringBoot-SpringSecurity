@@ -2,12 +2,9 @@ package com.pjborowiecki.springbank.auth;
 
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.pjborowiecki.springbank.customer.Customer;
 import com.pjborowiecki.springbank.customer.CustomerRequest;
@@ -18,23 +15,26 @@ import com.pjborowiecki.springbank.customer.CustomerRepository;
 public class AuthController {
 
     private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(CustomerRepository customerRepository) {
+    public AuthController(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/signup")
     public ResponseEntity<Customer> signup(@RequestBody CustomerRequest newCustomerRequest, UriComponentsBuilder ucb) {
-        Customer customer = new Customer(null,
+        Customer newCustomer = new Customer(null,
                 newCustomerRequest.email(),
                 newCustomerRequest.password(),
                 newCustomerRequest.role());
 
-        // Passowrd hasing
+        String passordHash = this.passwordEncoder.encode(newCustomer.getPassword());
+        newCustomer.setPassword(passordHash);
 
-        Customer newCustomer = this.customerRepository.save(customer);
-        URI newCustomerLocation = ucb.path("/api/v1/customers/{id}").buildAndExpand(newCustomer.getId()).toUri();
-        return ResponseEntity.created(newCustomerLocation).body(newCustomer);
+        Customer savedCustomer = this.customerRepository.save(newCustomer);
+        URI savedCustomerLocation = ucb.path("/api/v1/customers/{id}").buildAndExpand(savedCustomer.getId()).toUri();
+        return ResponseEntity.created(savedCustomerLocation).body(savedCustomer);
     }
 
 }
