@@ -1,4 +1,4 @@
-package com.pjborowiecki.springbank.customer;
+package com.pjborowiecki.springbank.card;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
@@ -9,40 +9,43 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class Customer {
+@Table(name = "cards")
+public class Card {
 
     @Id
+    @Column(name = "card_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    @Column(name = "customer_id", nullable = false, unique = true)
+    private Long cardId;
+
+    @Column(name = "card_number", nullable = false, unique = true)
     private Long customerId;
 
-    @Column(nullable = false, length = 64)
-    private String name;
+    @Column(name = "card_type", nullable = false, length = 32)
+    private String cardType;
 
-    @Column(nullable = false, unique = true, length = 64)
-    private String email;
+    @Column(name = "total_limit", nullable = false)
+    private Long totalLimit;
 
-    @Column(nullable = false, length = 64)
-    private String mobile;
+    @Column(name = "amount_used", nullable = false)
+    private Long amountUsed;
 
-    @Column(nullable = false, length = 512)
-    private String password;
-
-    @Column(nullable = false, length = 32)
-    private String role;
+    @Column(name = "available_amount", nullable = false)
+    private Long availableAmount;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 }
