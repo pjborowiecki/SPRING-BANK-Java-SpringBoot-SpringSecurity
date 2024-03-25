@@ -21,7 +21,8 @@ public class CustomerDetails implements UserDetailsService {
         Customer customer = customerRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return User.withUsername(customer.getEmail())
+        return User
+                .withUsername(customer.getEmail())
                 .password(customer.getPassword())
                 .authorities(new SimpleGrantedAuthority(customer.getRole()))
                 .build();
