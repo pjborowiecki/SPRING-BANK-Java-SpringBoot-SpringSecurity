@@ -24,16 +24,17 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<Customer> signup(@RequestBody CustomerRequest newCustomerRequest, UriComponentsBuilder ucb) {
-        Customer newCustomer = new Customer(null,
-                newCustomerRequest.email(),
-                newCustomerRequest.password(),
-                newCustomerRequest.role());
+        Customer newCustomer = Customer.builder()
+                .email(newCustomerRequest.email())
+                .password(newCustomerRequest.password())
+                .role(newCustomerRequest.role())
+                .build();
 
         String passordHash = this.passwordEncoder.encode(newCustomer.getPassword());
         newCustomer.setPassword(passordHash);
 
         Customer savedCustomer = this.customerRepository.save(newCustomer);
-        URI savedCustomerLocation = ucb.path("/api/v1/customers/{id}").buildAndExpand(savedCustomer.getId()).toUri();
+        URI savedCustomerLocation = ucb.path("/api/v1/customer/{id}").buildAndExpand(savedCustomer.getId()).toUri();
         return ResponseEntity.created(savedCustomerLocation).body(savedCustomer);
     }
 
