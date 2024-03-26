@@ -1,4 +1,4 @@
-package com.pjborowiecki.springbank.card;
+package com.pjborowiecki.springbank.transaction;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -12,23 +12,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 @RestController
-@RequestMapping("/api/v1/cards")
-public class CardController {
+@RequestMapping("/api/v1/transactions")
+public class TransactionController {
 
-    private final CardRepository cardRepository;
+    private final TransactionRepository transactionRepository;
 
-    public CardController(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
+    public TransactionController(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
     @GetMapping
-    public ResponseEntity<List<Card>> findAll(@RequestParam Long customerId, Pageable pageable) {
-        Page<Card> page = cardRepository.findByCustomerId(
+    public ResponseEntity<List<Transaction>> findAll(@RequestParam Long customerId, Pageable pageable) {
+        Page<Transaction> page = transactionRepository.findByCustomerId(
                 customerId,
                 PageRequest.of(
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
-                        pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"))));
+                        pageable.getSortOr(Sort.by(Sort.Direction.DESC, "transactionDate"))));
         return ResponseEntity.ok(page.getContent());
     }
+
 }

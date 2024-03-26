@@ -1,12 +1,14 @@
 package com.pjborowiecki.springbank.loan;
 
-import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 @Repository
-public interface LoanRepository extends CrudRepository<Loan, Long> {
+public interface LoanRepository extends CrudRepository<Loan, Long>, PagingAndSortingRepository<Loan, Long> {
 
-    List<Loan> findByCustomerIdOrderByStartDateDesc(Long customerId);
+    Page<Loan> findByCustomerId(Long customerId, PageRequest pageRequest);
 
 }

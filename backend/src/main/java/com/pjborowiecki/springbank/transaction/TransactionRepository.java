@@ -1,11 +1,14 @@
 package com.pjborowiecki.springbank.transaction;
 
-import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction, String> {
+public interface TransactionRepository
+        extends CrudRepository<Transaction, String>, PagingAndSortingRepository<Transaction, String> {
 
-    List<Transaction> findByCustomerIdOrderByTransactionDataDesc(Long customerId);
+    Page<Transaction> findByCustomerId(Long customerId, PageRequest pageRequest);
 }

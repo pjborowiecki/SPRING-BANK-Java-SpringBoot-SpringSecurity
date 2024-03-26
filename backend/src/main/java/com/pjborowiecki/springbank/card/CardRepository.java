@@ -1,12 +1,14 @@
 package com.pjborowiecki.springbank.card;
 
-import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 @Repository
-public interface CardRepository extends CrudRepository<Card, Long> {
+public interface CardRepository extends CrudRepository<Card, Long>, PagingAndSortingRepository<Card, Long> {
 
-    List<Card> findByCustomerId(Long customerId);
+    Page<Card> findByCustomerId(Long customerId, PageRequest pageRequest);
 
 }
