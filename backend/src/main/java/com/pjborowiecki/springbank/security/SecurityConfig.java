@@ -1,4 +1,4 @@
-package com.pjborowiecki.springbank.config;
+package com.pjborowiecki.springbank.security;
 
 import java.util.Collections;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +7,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,7 +33,7 @@ public class SecurityConfig {
                         "/api/v1/customers"
         };
 
-        private CorsConfiguration buildCorsConfiguration() {
+        private CorsConfiguration corsHandler() {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
                 config.setAllowedMethods(Collections.singletonList("*"));
@@ -40,12 +43,22 @@ public class SecurityConfig {
                 return config;
         }
 
+        private CsrfTokenRequestAttributeHandler csrfHandler() {
+                CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+                requestHandler.setCsrfRequestAttributeName("_csrf");
+                return requestHandler;
+        }
+
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(corsCustomizer -> corsCustomizer
-                                                .configurationSource(request -> buildCorsConfiguration()))
-                                .csrf((csrf) -> csrf.disable())
+                                                .configurationSource(request -> corsHandler()))
+                                .csrf((csrf) -> csrf.csrfTokenRequestHandler(csrfHandler())
+                                                .ignoringRequestMatchers(PUBLIC_URLS)
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                                .addFilterAfter(new SecurityCsrfCookieFilter(),
+                                                BasicAuthenticationFilter.class)
                                 .authorizeHttpRequests((request) -> request
                                                 .requestMatchers(PROTECTED_URLS).authenticated()
                                                 .requestMatchers(PUBLIC_URLS).permitAll())
