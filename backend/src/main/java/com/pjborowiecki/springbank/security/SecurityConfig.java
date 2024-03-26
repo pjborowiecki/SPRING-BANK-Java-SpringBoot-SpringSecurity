@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class SecurityConfig {
 
-        private static final String[] PUBLIC_URLS = {
+        private static final String[] PUBLIC_ROUTES = {
                         "/api/v1/auth/signup",
                         "/api/v1/auth/signin",
                         "/api/v1/auth/current-user",
@@ -25,12 +25,16 @@ public class SecurityConfig {
                         "/api/v1/notifications"
         };
 
-        private static final String[] PROTECTED_URLS = {
+        private static final String[] PROTECTED_ROUTES = {
                         "/api/v1/accounts",
                         "/api/v1/transactions",
                         "/api/v1/loans",
                         "/api/v1/cards",
                         "/api/v1/customers"
+        };
+
+        private static final String[] ADMIN_ONLY_ROUTES = {
+                        "/api/v1/dashboard"
         };
 
         private CorsConfiguration corsHandler() {
@@ -55,13 +59,15 @@ public class SecurityConfig {
                                 .cors(corsCustomizer -> corsCustomizer
                                                 .configurationSource(request -> corsHandler()))
                                 .csrf((csrf) -> csrf.csrfTokenRequestHandler(csrfHandler())
-                                                .ignoringRequestMatchers(PUBLIC_URLS)
+                                                .ignoringRequestMatchers(PUBLIC_ROUTES)
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                                 .addFilterAfter(new SecurityCsrfCookieFilter(),
                                                 BasicAuthenticationFilter.class)
                                 .authorizeHttpRequests((request) -> request
-                                                .requestMatchers(PROTECTED_URLS).authenticated()
-                                                .requestMatchers(PUBLIC_URLS).permitAll())
+                                                .requestMatchers(ADMIN_ONLY_ROUTES).hasRole("ADMIN")
+                                                .requestMatchers(PROTECTED_ROUTES).hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(PROTECTED_ROUTES).authenticated()
+                                                .requestMatchers(PUBLIC_ROUTES).permitAll())
                                 .formLogin(Customizer.withDefaults())
                                 .httpBasic(Customizer.withDefaults());
                 return http.build();
