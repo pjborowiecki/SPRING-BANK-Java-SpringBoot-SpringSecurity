@@ -1,6 +1,5 @@
 package com.pjborowiecki.springbank.account;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
