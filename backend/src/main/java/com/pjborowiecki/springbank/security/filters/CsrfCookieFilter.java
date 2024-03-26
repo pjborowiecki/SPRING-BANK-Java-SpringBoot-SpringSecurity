@@ -1,4 +1,4 @@
-package com.pjborowiecki.springbank.security;
+package com.pjborowiecki.springbank.security.filters;
 
 import java.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -9,7 +9,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.lang.NonNull;
 
-public class SecurityCsrfCookieFilter extends OncePerRequestFilter {
+public class CsrfCookieFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(

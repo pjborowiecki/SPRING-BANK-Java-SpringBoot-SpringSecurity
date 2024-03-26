@@ -4,6 +4,7 @@ import java.util.Collections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
+
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,6 +14,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.pjborowiecki.springbank.security.filters.CsrfCookieFilter;
+import com.pjborowiecki.springbank.security.filters.AfterSigninLoggingFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -61,8 +65,8 @@ public class SecurityConfig {
                                 .csrf((csrf) -> csrf.csrfTokenRequestHandler(csrfHandler())
                                                 .ignoringRequestMatchers(PUBLIC_ROUTES)
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                                .addFilterAfter(new SecurityCsrfCookieFilter(),
-                                                BasicAuthenticationFilter.class)
+                                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                                .addFilterAfter(new AfterSigninLoggingFilter(), BasicAuthenticationFilter.class)
                                 .authorizeHttpRequests((request) -> request
                                                 .requestMatchers(ADMIN_ONLY_ROUTES).hasRole("ADMIN")
                                                 .requestMatchers(PROTECTED_ROUTES).hasAnyRole("USER", "ADMIN")
