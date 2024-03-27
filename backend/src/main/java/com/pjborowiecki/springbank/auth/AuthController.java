@@ -40,7 +40,7 @@ public class AuthController {
         return ResponseEntity.created(savedCustomerLocation).body(savedCustomer);
     }
 
-    @GetMapping("/current-user")
+    @GetMapping("/signin")
     public ResponseEntity<Customer> getCurrentUser(Authentication authentication) {
         Optional<Customer> currentUser = customerRepository.findByEmail(authentication.getName());
         if (currentUser.isPresent()) {
