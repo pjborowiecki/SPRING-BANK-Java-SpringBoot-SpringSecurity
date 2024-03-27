@@ -15,15 +15,15 @@ INSERT
 
 
 CREATE TABLE `accounts` (
-  `customer_id` int NOT NULL,
-  `account_number` int NOT NULL,
-  `account_type` varchar(64) NOT NULL,
-  `branch_address` varchar(128) NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
-  PRIMARY KEY (`account_number`),
-  KEY `customer_id` (`customer_id`),
-  CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
+    `customer_id` int NOT NULL,
+    `account_number` int NOT NULL,
+    `account_type` varchar(64) NOT NULL,
+    `branch_address` varchar(128) NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+    PRIMARY KEY (`account_number`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
 
 INSERT 
     INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch_address`)
@@ -31,21 +31,21 @@ INSERT
 
 
 CREATE TABLE `account_transactions` (
-  `transaction_id` varchar(256) NOT NULL,
-  `account_number` int NOT NULL,
-  `customer_id` int NOT NULL,
-  `transaction_date` date NOT NULL,
-  `transaction_summary` varchar(128) NOT NULL,
-  `transaction_type` varchar(64) NOT NULL,
-  `transaction_amount` int NOT NULL,
-  `closing_balance` int NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
-  PRIMARY KEY (`transaction_id`),
-  KEY `customer_id` (`customer_id`),
-  KEY `account_number` (`account_number`),
-  CONSTRAINT `accounts_ibfk_2` FOREIGN KEY (`account_number`) REFERENCES `accounts` (`account_number`) ON DELETE CASCADE,
-  CONSTRAINT `acct_user_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
+    `transaction_id` varchar(256) NOT NULL,
+    `account_number` int NOT NULL,
+    `customer_id` int NOT NULL,
+    `transaction_date` date NOT NULL,
+    `transaction_summary` varchar(128) NOT NULL,
+    `transaction_type` varchar(64) NOT NULL,
+    `transaction_amount` int NOT NULL,
+    `closing_balance` int NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+    PRIMARY KEY (`transaction_id`),
+    KEY `customer_id` (`customer_id`),
+    KEY `account_number` (`account_number`),
+    CONSTRAINT `accounts_ibfk_2` FOREIGN KEY (`account_number`) REFERENCES `accounts` (`account_number`) ON DELETE CASCADE,
+    CONSTRAINT `acct_user_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
 
 INSERT 
     INTO `account_transactions` (`transaction_id`, `account_number`, `customer_id`, `transaction_date`, `transaction_summary`, `transaction_type`, `transaction_amount`, `closing_balance`, `created_at`)  
@@ -68,18 +68,18 @@ INSERT
 
 
 CREATE TABLE `loans` (
-  `loan_number` int NOT NULL AUTO_INCREMENT,
-  `customer_id` int NOT NULL,
-  `start_date` date NOT NULL,
-  `loan_type` varchar(64) NOT NULL,
-  `amount_total` int NOT NULL,
-  `amount_paid` int NOT NULL,
-  `amount_outstanding` int NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`loan_number`),
-  KEY `customer_id` (`customer_id`),
-  CONSTRAINT `loan_customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
+    `loan_number` int NOT NULL AUTO_INCREMENT,
+    `customer_id` int NOT NULL,
+    `start_date` date NOT NULL,
+    `loan_type` varchar(64) NOT NULL,
+    `amount_total` int NOT NULL,
+    `amount_paid` int NOT NULL,
+    `amount_outstanding` int NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`loan_number`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `loan_customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
 
 INSERT
     INTO `loans` ( `customer_id`, `start_date`, `loan_type`, `amount_total`, `amount_paid`, `amount_outstanding`)
@@ -96,18 +96,18 @@ INSERT
 
 
 CREATE TABLE `cards` (
-  `card_id` int NOT NULL AUTO_INCREMENT,
-  `card_number` varchar(64) NOT NULL,
-  `customer_id` int NOT NULL,
-  `card_type` varchar(32) NOT NULL,
-  `total_limit` int NOT NULL,
-  `amount_used` int NOT NULL,
-  `available_amount` int NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`card_id`),
-  KEY `customer_id` (`customer_id`),
-  CONSTRAINT `card_customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
+    `card_id` int NOT NULL AUTO_INCREMENT,
+    `card_number` varchar(64) NOT NULL,
+    `customer_id` int NOT NULL,
+    `card_type` varchar(32) NOT NULL,
+    `total_limit` int NOT NULL,
+    `amount_used` int NOT NULL,
+    `available_amount` int NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`card_id`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `card_customer_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE);
 
 INSERT 
     INTO `cards` (`card_number`, `customer_id`, `card_type`, `total_limit`, `amount_used`, `available_amount`, `created_at`)
@@ -121,14 +121,14 @@ INSERT
 
 
 CREATE TABLE `notifications` (
-  `notification_id` int NOT NULL AUTO_INCREMENT,
-  `notification_summary` varchar(256) NOT NULL,
-  `notification_details` varchar(1024) NOT NULL,
-  `notification_start_date` date NOT NULL,
-  `notification_end_date` date DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`notification_id`));
+    `notification_id` int NOT NULL AUTO_INCREMENT,
+    `notification_summary` varchar(256) NOT NULL,
+    `notification_details` varchar(1024) NOT NULL,
+    `notification_start_date` date NOT NULL,
+    `notification_end_date` date DEFAULT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`notification_id`));
 
 INSERT 
     INTO `notifications` ( `notification_summary`, `notification_details`, `notification_start_date`, `notification_end_date`, `created_at`, `updated_at`)
@@ -151,11 +151,29 @@ INSERT
 
 
 CREATE TABLE `messages` (
-  `message_id` varchar(256) NOT NULL,
-  `name` varchar(32) NOT NULL,
-  `email` varchar(32) NOT NULL,
-  `subject` varchar(128) NOT NULL,
-  `message` varchar(2048) NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`message_id`));
+    `message_id` varchar(256) NOT NULL,
+    `name` varchar(32) NOT NULL,
+    `email` varchar(32) NOT NULL,
+    `subject` varchar(128) NOT NULL,
+    `message` varchar(2048) NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`message_id`));
+
+
+CREATE TABLE `authorities` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `customer_id` int NOT NULL,
+    `name` varchar(64) NOT NULL,
+    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `authorities_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`));
+
+INSERT 
+    INTO `authorities` (`customer_id`, `name`)
+    VALUES (1, 'ROLE_USER');
+INSERT 
+    INTO `authorities` (`customer_id`, `name`)
+    VALUES (1, 'ROLE_ADMIN');

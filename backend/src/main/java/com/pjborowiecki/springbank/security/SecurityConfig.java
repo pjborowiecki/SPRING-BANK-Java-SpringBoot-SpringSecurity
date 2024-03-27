@@ -1,31 +1,40 @@
 package com.pjborowiecki.springbank.security;
 
 import java.util.Collections;
+import java.util.Arrays;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.pjborowiecki.springbank.security.filters.CsrfCookieFilter;
+import com.pjborowiecki.springbank.security.filters.AfterSigninLoggingFilter;
+import com.pjborowiecki.springbank.security.filters.JwtGenerationFilter;
+import com.pjborowiecki.springbank.security.filters.JwtValidationFilter;
 
 @Configuration
 public class SecurityConfig {
 
-        private static final String[] PUBLIC_URLS = {
+        private static final String[] PUBLIC_ROUTES = {
                         "/api/v1/auth/signup",
                         "/api/v1/auth/signin",
-                        "/api/v1/auth/current-user",
                         "/api/v1/messages",
                         "/api/v1/notifications"
         };
 
-        private static final String[] PROTECTED_URLS = {
+        private static final String[] PROTECTED_ROUTES = {
                         "/api/v1/accounts",
                         "/api/v1/transactions",
                         "/api/v1/loans",
@@ -33,12 +42,19 @@ public class SecurityConfig {
                         "/api/v1/customers"
         };
 
+        private static final String[] ADMIN_ONLY_ROUTES = {
+                        "/api/v1/dashboard"
+        };
+
+        private final SecretKey signingKey;
+
         private CorsConfiguration corsHandler() {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
                 config.setAllowedMethods(Collections.singletonList("*"));
-                config.setAllowCredentials(true);
                 config.setAllowedHeaders(Collections.singletonList("*"));
+                config.setExposedHeaders(Arrays.asList("Authorization"));
+                config.setAllowCredentials(true);
                 config.setMaxAge(3600L);
                 return config;
         }
@@ -49,19 +65,29 @@ public class SecurityConfig {
                 return requestHandler;
         }
 
+        public SecurityConfig(@Value("${security.jwt.token.secret-key:secret-key}") String secret) {
+                this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        }
+
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .cors(corsCustomizer -> corsCustomizer
                                                 .configurationSource(request -> corsHandler()))
                                 .csrf((csrf) -> csrf.csrfTokenRequestHandler(csrfHandler())
-                                                .ignoringRequestMatchers(PUBLIC_URLS)
+                                                .ignoringRequestMatchers(PUBLIC_ROUTES)
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                                .addFilterAfter(new SecurityCsrfCookieFilter(),
-                                                BasicAuthenticationFilter.class)
+                                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                                .addFilterAfter(new AfterSigninLoggingFilter(), BasicAuthenticationFilter.class)
+                                .addFilterAfter(new JwtGenerationFilter(signingKey), BasicAuthenticationFilter.class)
+                                .addFilterBefore(new JwtValidationFilter(signingKey), JwtGenerationFilter.class)
                                 .authorizeHttpRequests((request) -> request
-                                                .requestMatchers(PROTECTED_URLS).authenticated()
-                                                .requestMatchers(PUBLIC_URLS).permitAll())
+                                                .requestMatchers(ADMIN_ONLY_ROUTES).hasRole("ADMIN")
+                                                .requestMatchers(PROTECTED_ROUTES).hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers(PROTECTED_ROUTES).authenticated()
+                                                .requestMatchers(PUBLIC_ROUTES).permitAll())
                                 .formLogin(Customizer.withDefaults())
                                 .httpBasic(Customizer.withDefaults());
                 return http.build();

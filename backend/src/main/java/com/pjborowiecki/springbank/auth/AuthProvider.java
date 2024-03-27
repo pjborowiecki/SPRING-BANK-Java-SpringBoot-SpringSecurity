@@ -1,5 +1,6 @@
 package com.pjborowiecki.springbank.auth;
 
+import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.pjborowiecki.springbank.customer.Customer;
 import com.pjborowiecki.springbank.customer.CustomerRepository;
+import com.pjborowiecki.springbank.authority.Authority;
 
 @Component
 public class AuthProvider implements AuthenticationProvider {
@@ -37,7 +39,8 @@ public class AuthProvider implements AuthenticationProvider {
         if (customer.isPresent() && passwordEncoder.matches(password, customer.get().getPassword())) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(customer.get().getRole()));
-            return new UsernamePasswordAuthenticationToken(userName, password, authorities);
+            return new UsernamePasswordAuthenticationToken(userName, password,
+                    getGrantedAuthorities(customer.get().getAuthorities()));
         } else {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -46,6 +49,13 @@ public class AuthProvider implements AuthenticationProvider {
     @Override
     public boolean supports(Class<?> authentication) {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(Set<Authority> authorities) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (Authority authority : authorities)
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
+        return grantedAuthorities;
     }
 
 }
